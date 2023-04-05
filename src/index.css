@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand_gradient-color: linear-gradient(#52bbff, #bb38fe);
+    --accent-color: #1f306e;
+    --secondary-color: #bb38fe;
+    --tertiary-color: #ffb70f;
+    --light_bg-color: #f3f2f1;
+    --black-color: #242424;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply text-black bg-white touch-none;
+    font-family: Barlow, system-ui, sans-serif;
+    line-height: 30px;
+    font-size: 21px;
+    /* touch-action: none; */
+  }
+
+  .text-phudu {
+    font-family: "Phudu", cursive;
+  }
+  button:active,
+  a:active {
+    @apply opacity-90;
+  }
+}
+
+@layer utilities {
+  .bg-brand-gradient {
+    background-image: var(--brand_gradient-color);
+  }
+  .text-brand-gradient {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+
+    --tw-gradient-from: var(--secondary-color) var(--tw-gradient-from-position);
+    --tw-gradient-from-position: ;
+    --tw-gradient-to: var(--secondary-color) var(--tw-gradient-from-position);
+    --tw-gradient-to-position: ;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+
+    --tw-gradient-to: var(--accent-color) var(--tw-gradient-to-position);
+    --tw-gradient-to-position: ;
+    background-clip: text;
+    color: transparent;
+  }
+}
