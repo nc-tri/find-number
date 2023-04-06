@@ -10,7 +10,7 @@ export default function Dialog({ children, open, className, classDialog }) {
       >
         <dialog
           open={open}
-          className={`flex flex-col text-center gap-4 border border-accent rounded-lg max-w-[280px] w-full top-1/2 -translate-y-1/2 drop-shadow-lg px-8 ${
+          className={`flex flex-col text-center gap-4 border border-black/10 rounded-lg max-w-[320px] w-auto top-1/2 -translate-y-1/2 drop-shadow-lg px-2 ${
             classDialog ? classDialog : ""
           }`}
         >

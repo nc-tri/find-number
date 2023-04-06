@@ -1,16 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Dialog from "./Dialog";
+import Sound from "react-sound";
 
 export default function Menu() {
   const [open, setOpen] = useState(false);
   const [openRule, setOpenRule] = useState(false);
+  const [control, setControl] = useState({
+    playStatusMusic: Sound.status.PLAYING,
+    playStatusSound: Sound.status.PLAYING,
+  });
+
+  useEffect(() => {
+    const soundLocal = JSON.parse(localStorage.getItem("sound"));
+    if (!soundLocal) return;
+    else {
+      setControl((prev) => ({ ...prev, ...soundLocal }));
+    }
+  }, []);
+
   const toggleDialog = () => {
     setOpen((prev) => !prev);
   };
 
   const toggleDialogRule = () => {
     setOpenRule((prev) => !prev);
+  };
+
+  const checkPlaying = (status) => {
+    const isPlaying = status === Sound.status.PLAYING;
+    return isPlaying;
+  };
+
+  const toggleMusic = () => {
+    const status = checkPlaying(control.playStatusMusic)
+      ? Sound.status.PAUSED
+      : Sound.status.PLAYING;
+    setControl((prev) => ({ ...prev, playStatusMusic: status }));
+    const soundLocal = JSON.parse(localStorage.getItem("sound"));
+
+    localStorage.setItem(
+      "sound",
+      JSON.stringify({ ...soundLocal, playStatusMusic: status })
+    );
+  };
+
+  const toggleSound = () => {
+    const status = checkPlaying(control.playStatusSound)
+      ? Sound.status.PAUSED
+      : Sound.status.PLAYING;
+    setControl((prev) => ({ ...prev, playStatusSound: status }));
+    const soundLocal = JSON.parse(localStorage.getItem("sound"));
+
+    localStorage.setItem(
+      "sound",
+      JSON.stringify({ ...soundLocal, playStatusSound: status })
+    );
   };
 
   return (
@@ -32,14 +77,17 @@ export default function Menu() {
           />
         </svg>
       </button>
-      <Dialog open={open}>
+      <Dialog open={open} classDialog={"!max-w-[280px]"}>
         <div className="flex gap-4 justify-between">
           <button
+            onClick={toggleSound}
             className={`p-4 text-2xl font-semibold rounded-lg ${
-              true ? "bg-primary/90" : "bg-quaternary/80"
+              checkPlaying(control.playStatusSound)
+                ? "bg-primary/90"
+                : "bg-quaternary/80"
             } text-white`}
           >
-            {true ? (
+            {checkPlaying(control.playStatusSound) ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -61,11 +109,14 @@ export default function Menu() {
             )}
           </button>
           <button
+            onClick={toggleMusic}
             className={`p-4 text-2xl font-semibold rounded-lg ${
-              true ? "bg-primary/90" : "bg-quaternary/80"
+              checkPlaying(control.playStatusMusic)
+                ? "bg-primary/90"
+                : "bg-quaternary/80"
             } text-white`}
           >
-            {true ? (
+            {control.playStatusMusic === Sound.status.PLAYING ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -73,9 +124,9 @@ export default function Menu() {
                 className="w-6 h-6"
               >
                 <path
-                  fill-rule="evenodd"
+                  fillRule="evenodd"
                   d="M19.952 1.651a.75.75 0 01.298.599V16.303a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.403-4.909l2.311-.66a1.5 1.5 0 001.088-1.442V6.994l-9 2.572v9.737a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.402-4.909l2.31-.66a1.5 1.5 0 001.088-1.442V9.017 5.25a.75.75 0 01.544-.721l10.5-3a.75.75 0 01.658.122z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 />
               </svg>
             ) : (
@@ -87,9 +138,9 @@ export default function Menu() {
               >
                 <path d="M3.53 2.47a.75.75 0 00-1.06 1.06l18 18a.75.75 0 101.06-1.06l-18-18zM20.57" />
                 <path
-                  fill-rule="evenodd"
+                  fillRule="evenodd"
                   d="M19.952 1.651a.75.75 0 01.298.599V16.303a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.403-4.909l2.311-.66a1.5 1.5 0 001.088-1.442V6.994l-9 2.572v9.737a3 3 0 01-2.176 2.884l-1.32.377a2.553 2.553 0 11-1.402-4.909l2.31-.66a1.5 1.5 0 001.088-1.442V9.017 5.25a.75.75 0 01.544-.721l10.5-3a.75.75 0 01.658.122z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 />
               </svg>
             )}
