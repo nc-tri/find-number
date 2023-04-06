@@ -23,9 +23,17 @@
   .text-phudu {
     font-family: "Phudu", cursive;
   }
+
+  .text-barlow {
+    font-family: Barlow, system-ui, sans-serif;
+  }
+
   button:active,
   a:active {
     @apply opacity-90;
+  }
+  dialog {
+    @apply bg-white;
   }
 }
 

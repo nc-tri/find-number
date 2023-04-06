@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Dialog from "../components/Dialog";
 export default function MainPage() {
   const maxRow = 10;
   const arrGuess = Object.assign({}, [
@@ -146,37 +147,24 @@ export default function MainPage() {
           </button>
         </div>
       </div>
-      <div
-        className={`${
-          openDialog ? "" : "hidden"
-        } fixed h-screen w-screen inset-0`}
-      >
-        <dialog
-          open={openDialog}
-          className="flex flex-col gap-4 bg-white border border-accent rounded-lg max-w-[280px] w-full mt-[240px] drop-shadow-lg"
-        >
-          <div className="flex flex-col h-[200px] w-[200px] m-auto text-center justify-evenly text-phudu">
-            <h3 className="text-3xl text-accent font-bold">Chơi lại?</h3>
+      <Dialog open={openDialog}>
+        <div className="flex flex-col h-[200px] w-[200px] m-auto text-center justify-evenly text-phudu">
+          <h3 className="text-3xl text-accent font-bold">Chơi lại?</h3>
 
-            <button
-              onClick={retryGame}
-              className="px-4 py-2 text-2xl font-semibold w-full mx-auto rounded-lg bg-tertiary/80 text-white"
-            >
-              Đồng ý
-            </button>
-            <button
-              onClick={toggleDialog}
-              className="px-4 py-2 text-2xl font-semibold w-full mx-auto rounded-lg bg-quaternary/80 text-white"
-            >
-              Đóng
-            </button>
-          </div>
-        </dialog>
-      </div>
-      {/* <div className="flex text-center text-phudu font-bold p-2 bg-white justify-between items-center">
-        <h3>find number</h3>
-      </div> */}
-
+          <button
+            onClick={retryGame}
+            className="px-4 py-2 text-2xl font-semibold w-full mx-auto rounded-lg bg-tertiary/80 text-white"
+          >
+            Đồng ý
+          </button>
+          <button
+            onClick={toggleDialog}
+            className="px-4 py-2 text-2xl font-semibold w-full mx-auto rounded-lg bg-quaternary/80 text-white"
+          >
+            Đóng
+          </button>
+        </div>
+      </Dialog>
       <div className="h-full">
         <table className="w-full h-full text-center text-black bg-accent/10 rounded-lg">
           <thead className="text-sm">
@@ -220,12 +208,6 @@ export default function MainPage() {
             >
               Chơi lại
             </button>
-            {/* <Link
-              to={"/"}
-              className="px-4 py-2 text-2xl font-semibold w-full w-max mx-auto rounded-lg bg-tertiary/90 text-white"
-            >
-              Trang chủ
-            </Link> */}
           </div>
         ) : (
           <>
