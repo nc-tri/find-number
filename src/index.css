@@ -35,6 +35,9 @@
   dialog {
     @apply bg-white;
   }
+  * {
+    @apply select-none;
+  }
 }
 
 @layer utilities {

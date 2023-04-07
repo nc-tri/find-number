@@ -175,18 +175,13 @@ export default function Menu() {
         <div className="flex flex-col gap-2">
           <h3 className="text-2xl font-semibold">Cách chơi</h3>
           <ul className="list-disc list-inside text-base font-semibold space-y-2 text-left bg-primary/50 p-2 rounded-lg">
-            <li>Đoán số bí mật dựa trên sự liên quan</li>
+            <li>Đoán số bí mật dựa trên các số đúng và vị trí đúng</li>
             <li>Bạn chỉ có 10 lần đoán</li>
             <li>
               Sau khi gửi mỗi lần đoán, bạn sẽ nhận được các gợi ý liên quan của
               số đó
             </li>
-            <li>Số bí mật là số có 4 chữ số không trùng nhau từ hệ thống</li>
-            {/* <li>Hãy tìm còn số từ hệ thống đưa ra</li>
-            <li>
-              ban sẽ nhận các gợi ý con số đúng và vị trí đúng sau mỗi lần trả
-              lời
-            </li> */}
+            <li>Số bí mật là số có 4 chữ số không trùng nhau</li>
           </ul>
           <h3 className="text-2xl font-semibold">Ví dụ</h3>
           <div className="text-black bg-white rounded-lg overflow-hidden">
