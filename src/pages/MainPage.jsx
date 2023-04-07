@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import Dialog from "../components/Dialog";
+import Button from "../components/Button";
+
 export default function MainPage() {
   const maxRow = 10;
   const arrGuess = Object.assign({}, [
@@ -128,7 +130,7 @@ export default function MainPage() {
         <div className="flex items-center justify-between">
           <p></p>
           <h3 className="pl-10 text-phudu font-bold">find number</h3>
-          <button
+          <Button
             onClick={toggleDialog}
             className="bg-primary text-white p-1 rounded-full"
           >
@@ -144,25 +146,25 @@ export default function MainPage() {
                 clipRule="evenodd"
               />
             </svg>
-          </button>
+          </Button>
         </div>
       </div>
       <Dialog open={openDialog} classDialog={"!max-w-[280px]"}>
         <div className="flex flex-col h-[200px] w-[200px] m-auto text-center justify-evenly text-phudu">
           <h3 className="text-3xl text-accent font-bold">Chơi lại?</h3>
 
-          <button
+          <Button
             onClick={retryGame}
             className="px-4 py-2 text-2xl font-semibold w-full mx-auto rounded-lg bg-tertiary/80 text-white"
           >
             Đồng ý
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={toggleDialog}
             className="px-4 py-2 text-2xl font-semibold w-full mx-auto rounded-lg bg-quaternary/80 text-white"
           >
             Đóng
-          </button>
+          </Button>
         </div>
       </Dialog>
       <div className="h-full">
@@ -202,12 +204,12 @@ export default function MainPage() {
             <h3 className="text-3xl text-brand-gradient font-bold">
               {finalGuess}
             </h3>
-            <button
+            <Button
               onClick={retryGame}
               className="px-4 py-2 text-2xl font-semibold w-full w-max mx-auto rounded-lg bg-secondary/70 text-white"
             >
               Chơi lại
-            </button>
+            </Button>
           </div>
         ) : (
           <>
@@ -217,16 +219,16 @@ export default function MainPage() {
             <div className="flex flex-col gap-2 w-full mx-auto">
               <div className="flex justify-stretch text-center items-center gap-2 py-2">
                 {number.slice(0, 5).map((value) => (
-                  <button
+                  <Button
                     key={value}
                     onClick={enterNumber}
                     value={value}
                     className="flex-1 bg-accent/10 rounded-md p-2"
                   >
                     {value}
-                  </button>
+                  </Button>
                 ))}
-                <button
+                <Button
                   onClick={deleteNumber}
                   className="flex-1 bg-secondary/70 text-white rounded-md p-2 h-[46px]"
                 >
@@ -244,20 +246,20 @@ export default function MainPage() {
                       d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"
                     />
                   </svg>
-                </button>
+                </Button>
               </div>
               <div className="flex justify-stretch text-center items-center gap-2 py-2">
                 {number.slice(5).map((value) => (
-                  <button
+                  <Button
                     key={value}
                     onClick={enterNumber}
                     value={value}
                     className="flex-1 bg-accent/10 rounded-md p-2"
                   >
                     {value}
-                  </button>
+                  </Button>
                 ))}
-                <button
+                <Button
                   onClick={onSubmit}
                   className="flex-1 bg-tertiary/90 text-white rounded-md p-2 h-[46px]"
                 >
@@ -275,7 +277,7 @@ export default function MainPage() {
                       d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
                     />
                   </svg>
-                </button>
+                </Button>
               </div>
             </div>
           </>

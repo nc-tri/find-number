@@ -1,23 +1,38 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
 import Dialog from "./Dialog";
-import Sound from "react-sound";
+import Button from "../components/Button";
+import useSound from "use-sound";
+import { EffectContext } from "./EffectContext";
+const bgSound = new URL("../assets/bg-sound.mp3", import.meta.url).href;
 
 export default function Menu() {
   const [open, setOpen] = useState(false);
   const [openRule, setOpenRule] = useState(false);
-  const [control, setControl] = useState({
-    playStatusMusic: Sound.status.PLAYING,
-    playStatusSound: Sound.status.PLAYING,
+  const [statusMusic, setStatusMusic] = useState(true);
+  const [statusEffect, setStatusEffect] = useState(true);
+
+  const { setEffect } = useContext(EffectContext);
+
+  const [play, { pause }] = useSound(bgSound, {
+    loop: true,
+    volume: 0.5,
   });
 
   useEffect(() => {
-    const soundLocal = JSON.parse(localStorage.getItem("sound"));
-    if (!soundLocal) return;
-    else {
-      setControl((prev) => ({ ...prev, ...soundLocal }));
-    }
+    const musicLocal = localStorage.getItem("statusMusic");
+    const effectLocal = localStorage.getItem("statusEffect");
+    if (musicLocal) setStatusMusic(JSON.parse(musicLocal));
+    if (effectLocal) setStatusEffect(JSON.parse(effectLocal));
   }, []);
+
+  useEffect(() => {
+    return statusMusic ? play() : pause();
+  }, [statusMusic, play, pause]);
+
+  useEffect(() => {
+    console.log(statusEffect);
+    setEffect(statusEffect);
+  }, [statusEffect]);
 
   const toggleDialog = () => {
     setOpen((prev) => !prev);
@@ -27,40 +42,23 @@ export default function Menu() {
     setOpenRule((prev) => !prev);
   };
 
-  const checkPlaying = (status) => {
-    const isPlaying = status === Sound.status.PLAYING;
-    return isPlaying;
-  };
-
   const toggleMusic = () => {
-    const status = checkPlaying(control.playStatusMusic)
-      ? Sound.status.PAUSED
-      : Sound.status.PLAYING;
-    setControl((prev) => ({ ...prev, playStatusMusic: status }));
-    const soundLocal = JSON.parse(localStorage.getItem("sound"));
-
-    localStorage.setItem(
-      "sound",
-      JSON.stringify({ ...soundLocal, playStatusMusic: status })
-    );
+    setStatusMusic((prev) => {
+      localStorage.setItem("statusMusic", JSON.stringify(!prev));
+      return !prev;
+    });
   };
 
-  const toggleSound = () => {
-    const status = checkPlaying(control.playStatusSound)
-      ? Sound.status.PAUSED
-      : Sound.status.PLAYING;
-    setControl((prev) => ({ ...prev, playStatusSound: status }));
-    const soundLocal = JSON.parse(localStorage.getItem("sound"));
-
-    localStorage.setItem(
-      "sound",
-      JSON.stringify({ ...soundLocal, playStatusSound: status })
-    );
+  const toggleEffect = () => {
+    setStatusEffect((prev) => {
+      localStorage.setItem("statusEffect", JSON.stringify(!prev));
+      return !prev;
+    });
   };
 
   return (
     <div className="flex text-phudu z-50">
-      <button
+      <Button
         onClick={toggleDialog}
         className="justify-center bg-black/50 rounded-full p-1 text-white"
       >
@@ -76,18 +74,16 @@ export default function Menu() {
             clipRule="evenodd"
           />
         </svg>
-      </button>
+      </Button>
       <Dialog open={open} classDialog={"!max-w-[280px]"}>
         <div className="flex gap-4 justify-between">
-          <button
-            onClick={toggleSound}
+          <Button
+            onClick={toggleEffect}
             className={`p-4 text-2xl font-semibold rounded-lg ${
-              checkPlaying(control.playStatusSound)
-                ? "bg-primary/90"
-                : "bg-quaternary/80"
+              statusEffect ? "bg-primary/90" : "bg-quaternary/80"
             } text-white`}
           >
-            {checkPlaying(control.playStatusSound) ? (
+            {statusEffect ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -107,16 +103,14 @@ export default function Menu() {
                 <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM17.78 9.22a.75.75 0 10-1.06 1.06L18.44 12l-1.72 1.72a.75.75 0 001.06 1.06l1.72-1.72 1.72 1.72a.75.75 0 101.06-1.06L20.56 12l1.72-1.72a.75.75 0 00-1.06-1.06l-1.72 1.72-1.72-1.72z" />
               </svg>
             )}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={toggleMusic}
             className={`p-4 text-2xl font-semibold rounded-lg ${
-              checkPlaying(control.playStatusMusic)
-                ? "bg-primary/90"
-                : "bg-quaternary/80"
+              statusMusic ? "bg-primary/90" : "bg-quaternary/80"
             } text-white`}
           >
-            {control.playStatusMusic === Sound.status.PLAYING ? (
+            {statusMusic ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -144,35 +138,35 @@ export default function Menu() {
                 />
               </svg>
             )}
-          </button>
+          </Button>
         </div>
-        <button className="flex text-xl font-semibold rounded-lg text-white overflow-hidden">
+        <Button className="flex text-xl font-semibold rounded-lg text-white overflow-hidden">
           <p className="flex-auto p-2 bg-accent/80">Ban đêm</p>
           {true ? (
             <p className="flex-none p-2 bg-tertiary/90">Bật</p>
           ) : (
             <p className="flex-none p-2 bg-accent/70">Tắt</p>
           )}
-        </button>
-        <Link
+        </Button>
+        <Button
           to={"/"}
           onClick={toggleDialog}
           className="px-4 py-2 text-xl font-semibold rounded-lg bg-secondary/80 text-white"
         >
           Trang chính
-        </Link>
-        <button
+        </Button>
+        <Button
           onClick={toggleDialogRule}
           className="px-4 py-2 text-xl font-semibold rounded-lg bg-tertiary/90 text-white"
         >
           Cách chơi
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={toggleDialog}
           className="px-4 py-2 text-xl font-semibold rounded-lg bg-quaternary/90 text-white"
         >
           Đóng
-        </button>
+        </Button>
       </Dialog>
       <Dialog
         open={openRule}
@@ -229,12 +223,12 @@ export default function Menu() {
             </ul>
           </div>
         </div>
-        <button
+        <Button
           onClick={toggleDialogRule}
           className="px-4 py-2 text-xl font-semibold rounded-lg bg-quaternary/90 text-white"
         >
           Đóng
-        </button>
+        </Button>
       </Dialog>
     </div>
   );
