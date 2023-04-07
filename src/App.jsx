@@ -5,7 +5,7 @@ import Layout from "./pages/Layout";
 
 function App() {
   return (
-    <BrowserRouter basename="/find-number">
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<IndexPage />} />
