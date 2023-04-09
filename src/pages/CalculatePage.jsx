@@ -4,7 +4,7 @@ import Dialog from "../components/Dialog";
 import { CALCULATE } from "../helper/constants";
 
 export default function CalculatePage() {
-  const { COLS, ROWS, NUMBER_CAL, MAX_NUMBER, TIMEOUT } = CALCULATE;
+  const { COLS, ROWS, NUMBER_CAL, SCOPE, TIMEOUT } = CALCULATE;
   const [selected, setSelected] = useState(
     [...new Array(NUMBER_CAL)].fill(null)
   );
@@ -12,6 +12,8 @@ export default function CalculatePage() {
   const [operation, setOperation] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [point, setPoint] = useState({ right: 0, wrong: 0 });
+  const [notify, setNotify] = useState("");
+  const [currentLevel, setCurrentLevel] = useState(1);
   const [arrNumber, setArrNumber] = useState([
     ...Array.from({ length: ROWS * COLS }, () => {
       return {
@@ -45,7 +47,14 @@ export default function CalculatePage() {
 
       setTimeout(() => {
         const strAnswer = answer === finalResult ? "right" : "wrong";
+        const notify = answer === finalResult ? "Chính xác" : "Sai rồi";
+        setNotify(notify);
         setPoint((prev) => {
+          let level = currentLevel;
+          if (prev.right >= currentLevel * SCOPE - 1) {
+            level = level + 1;
+            setCurrentLevel((prev) => prev + 1);
+          }
           const { arr, final } = resetArrNumber();
           const point = { ...prev, [strAnswer]: prev[strAnswer] + 1 };
           localStorage.setItem(
@@ -54,6 +63,7 @@ export default function CalculatePage() {
               point,
               arrNumber: arr,
               finalResult: final,
+              currentLevel: level,
             })
           );
           return point;
@@ -67,6 +77,7 @@ export default function CalculatePage() {
     if (calculateLocal) {
       const data = JSON.parse(calculateLocal);
       setPoint((prev) => ({ ...prev, ...data.point }));
+      setCurrentLevel(data.currentLevel);
       setFinalResult((prev) => {
         setArrNumber(data.arrNumber);
         return data.finalResult;
@@ -79,6 +90,10 @@ export default function CalculatePage() {
   useEffect(() => {
     resetSelected();
   }, [arrNumber]);
+
+  useEffect(() => {
+    if (notify) setTimeout(() => setNotify(""), TIMEOUT * 2);
+  }, [notify]);
 
   const randomResult = (arrNumber) => {
     const arrIsDisplay = arrNumber.filter((item) => item.isDisplay);
@@ -100,7 +115,7 @@ export default function CalculatePage() {
     const arr = [
       ...Array.from({ length: ROWS * COLS }, () => {
         return {
-          value: Math.floor(Math.random() * MAX_NUMBER),
+          value: Math.floor(Math.random() * (currentLevel * SCOPE * 2)),
           isDisplay: true,
         };
       }),
@@ -135,6 +150,7 @@ export default function CalculatePage() {
   const retryGame = () => {
     resetSelected();
     resetArrNumber();
+    setCurrentLevel(1);
     setPoint({ right: 0, wrong: 0 });
     localStorage.removeItem("calculate");
     setOpenDialog(false);
@@ -187,29 +203,42 @@ export default function CalculatePage() {
           </tbody>
         </table>
       </div>
-      <div className="flex justify-center text-4xl font-semibold py-4 ">
-        <div className="flex gap-2 justify-center text-center relative">
-          <p className="text-tertiary w-10">
-            {arrNumber[selected[0]]?.value ?? "_"}
+      <div className="flex flex-col flex-auto justify-center text-4xl font-semibold py-4 border-2 rounded-lg">
+        <div className="flex flex-1 items-center justify-center">
+          <p
+            className={`${
+              !notify ? "text-black" : "text-white bg-secondary/70"
+            } px-4 py-2 rounded-lg`}
+          >
+            {notify || `level ${currentLevel}`}
           </p>
-          <p>{strOperation(operation)}</p>
-          <p className="text-tertiary w-10">
-            {arrNumber[selected[1]]?.value ?? "_"}
-          </p>
-          <p>=</p>
-          <p className="text-brand-gradient w-10">{finalResult ?? "?"}</p>
+        </div>
+        <div className="flex flex-1 gap-2 justify-center items-center text-center relative">
+          <div className="flex gap-2 justify-center items-center rounded-lg">
+            <p className="text-black bg-accent/10 rounded-lg h-16 w-16 p-3">
+              {arrNumber[selected[0]]?.value ?? ""}
+            </p>
+            <p>{strOperation(operation)}</p>
+            <p className="text-black bg-accent/10 rounded-lg h-16 w-16 p-3">
+              {arrNumber[selected[1]]?.value ?? ""}
+            </p>
+            <p>=</p>
+            <p className="text-black bg-accent/10 rounded-lg h-16 w-16 p-3">
+              {finalResult ?? ""}
+            </p>
+          </div>
         </div>
       </div>
-      <div className={`grid grid-cols-${COLS ?? 4} gap-2`}>
+      <div className={`grid grid-cols-4 gap-2`}>
         {arrNumber.map((item, index) => (
           <div key={index}>
             <Button
               onClick={(ev) => enterNumber(ev, { value: item, index })}
               disabled={["", null, undefined].includes(item.value)}
-              className={`p-2 w-full disabled:pointe-events-none h-[52px] text-2xl border-2 border-accent/10 font-semibold rounded-lg ${
+              className={`p-2 w-full disabled:pointe-events-none h-[52px] text-2xl bg-accent/10 font-semibold rounded-lg ${
                 item.isDisplay
                   ? selected.includes(index)
-                    ? "bg-tertiary/80 text-white"
+                    ? "bg-secondary/80 text-white"
                     : ""
                   : "invisible"
               }`}

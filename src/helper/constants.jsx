@@ -13,8 +13,8 @@ export const COLOR = [
 
 export const CALCULATE = {
   COLS: 4,
-  ROWS: 1,
+  ROWS: 4,
   NUMBER_CAL: 2,
-  MAX_NUMBER: 10,
+  SCOPE: 5,
   TIMEOUT: 500,
 };
