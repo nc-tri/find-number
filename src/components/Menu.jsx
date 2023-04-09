@@ -3,9 +3,11 @@ import Dialog from "./Dialog";
 import Button from "../components/Button";
 import useSound from "use-sound";
 import { EffectContext } from "./EffectContext";
+import { useLocation } from "react-router-dom";
 const bgSound = new URL("../assets/bg-sound.mp3", import.meta.url).href;
 
 export default function Menu() {
+  const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const [openRule, setOpenRule] = useState(false);
   const [statusMusic, setStatusMusic] = useState(true);
@@ -30,7 +32,6 @@ export default function Menu() {
   }, [statusMusic, play, pause]);
 
   useEffect(() => {
-    console.log(statusEffect);
     setEffect(statusEffect);
   }, [statusEffect]);
 
@@ -151,13 +152,17 @@ export default function Menu() {
         <Button
           to={"/"}
           onClick={toggleDialog}
-          className="px-4 py-2 text-xl font-semibold rounded-lg bg-secondary/80 text-white"
+          className={`px-4 py-2 text-xl font-semibold rounded-lg bg-secondary/90 text-white ${
+            !["/"].includes(pathname) ? "" : "hidden"
+          }`}
         >
           Trang chính
         </Button>
         <Button
           onClick={toggleDialogRule}
-          className="px-4 py-2 text-xl font-semibold rounded-lg bg-tertiary/90 text-white"
+          className={`px-4 py-2 text-xl font-semibold rounded-lg bg-tertiary/90 text-white ${
+            ["/", "/main"].includes(pathname) ? "" : "hidden"
+          }`}
         >
           Cách chơi
         </Button>

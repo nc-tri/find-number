@@ -10,12 +10,18 @@ export default function IndexPage() {
         alt="logo"
       />
       <div>
-        <div className="mx-auto">
+        <div className="mx-auto inline-flex flex-col gap-2">
           <Button
             to="main"
-            className="px-4 py-2 text-3xl font-semibold w-full w-max rounded-lg bg-secondary/70 text-white"
+            className="px-4 py-2 text-3xl font-semibold w-auto rounded-lg bg-secondary/70 text-white"
           >
-            play
+            Đoán Số
+          </Button>
+          <Button
+            to="calculate"
+            className="px-4 py-2 text-3xl font-semibold w-auto rounded-lg bg-tertiary/90 text-white"
+          >
+            Phép Tính
           </Button>
         </div>
       </div>

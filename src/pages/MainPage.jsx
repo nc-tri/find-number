@@ -117,7 +117,7 @@ export default function MainPage() {
     setCurrentGuess(0);
     setGuessing([]);
     setOpenDialog(false);
-    localStorage.clear();
+    localStorage.removeItem("guess");
   };
 
   const toggleDialog = () => {
@@ -129,7 +129,7 @@ export default function MainPage() {
       <div className="absolute w-full top-0 -mt-[52px] right-0">
         <div className="flex items-center justify-between">
           <p></p>
-          <h3 className="pl-10 text-phudu font-bold">find number</h3>
+          <h3 className="pl-10 text-phudu font-bold">Đoán số</h3>
           <Button
             onClick={toggleDialog}
             className="bg-primary text-white p-1 rounded-full"
