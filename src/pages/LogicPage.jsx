@@ -75,9 +75,12 @@ const OPERATIONS = [
   },
 ];
 
-export default function CalculatePage() {
+export default function LogicPage() {
   const { COLS, ROWS, NUMBER_CAL, SCOPE, TIMEOUT } = CALCULATE;
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(
+    [...new Array(NUMBER_CAL)].fill(null)
+  );
+  const [finalResult, setFinalResult] = useState();
   const [operation, setOperation] = useState(["plus"]);
   const [tempOperation, setTempOperation] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
@@ -95,8 +98,6 @@ export default function CalculatePage() {
     }),
   ]);
 
-  const [calculationNumber, setCalculationNumber] = useState([]);
-
   const toggleDialog = () => {
     setOpenDialog((prev) => !prev);
   };
@@ -105,78 +106,20 @@ export default function CalculatePage() {
     return OPERATIONS.find((item) => item.id === value).svg;
   };
 
-  // useEffect(() => {
-  //   resetArrNumber();
-  // }, []);
-
-  const resetArrNumber = () => {
-    const arr = [
-      ...Array.from({ length: ROWS * COLS }, () => {
-        return {
-          value: Math.floor(Math.random() * (currentLevel * SCOPE * 2 + 1)),
-          isDisplay: true,
-        };
-      }),
-    ];
-    const random = Math.floor(Math.random() * (ROWS * COLS));
-    const arrCal = resetCalNumber();
-    const randomOperation =
-      operation[Math.floor(Math.random() * operation.length)];
-    const data = finalResultOperation(randomOperation, arrCal);
-    setSelected(null);
-
-    arr[random] = { ...arr[random], value: data };
-    console.log(data, arrCal, arr[random].value);
-    setArrNumber(arr);
-    return { arr, curOperation: randomOperation, selected: random, arrCal };
-  };
-
-  const finalResultOperation = (operation, arrCal) => {
-    let data;
-    switch (operation) {
-      case "plus":
-        data = arrCal.reduce((prev, cur) => prev + cur);
-        break;
-      case "minus":
-        data = arrCal.reduce((prev, cur) => prev - cur);
-        break;
-      case "multiply":
-        data = arrCal.reduce((prev, cur) => prev * cur);
-        break;
-      case "divide":
-        data = arrCal.reduce((prev, cur) => prev / cur);
-        break;
-    }
-    return data;
-  };
-
-  const resetCalNumber = () => {
-    const arrCal = [
-      ...Array.from({ length: NUMBER_CAL }, () => {
-        return Math.floor(Math.random() * SCOPE * currentLevel);
-      }),
-    ].sort((a, b) => b - a);
-    // console.log(arrCal);
-    setCalculationNumber(arrCal);
-    return arrCal;
-  };
-
-  const enterNumber = (ev, { value, index }) => {
-    ev.preventDefault();
-    setSelected(index);
-  };
-
   useEffect(() => {
-    // const arrSelected = selected.map((item) => arrNumber[item].value);
-    if (selected !== null) {
-      const answer = finalResultOperation(currentOperation, calculationNumber);
+    const foundEmpty = selected.findIndex((item) =>
+      [undefined, null, ""].includes(item)
+    );
+
+    if (foundEmpty < 0) {
+      const arrSelected = selected.map((item) => arrNumber[item].value);
+      const answer = finalResultOperation(arrSelected, currentOperation);
+
       setTimeout(() => {
         const strAnswer =
-          answer?.toFixed(0) === arrNumber[selected].value?.toFixed(0)
-            ? "right"
-            : "wrong";
+          answer.toFixed(0) === finalResult.toFixed(0) ? "right" : "wrong";
         const notify =
-          answer?.toFixed(0) === arrNumber[selected].value?.toFixed(0)
+          answer.toFixed(0) === finalResult.toFixed(0)
             ? "Chính xác"
             : "Sai rồi";
         setNotify(notify);
@@ -186,17 +129,16 @@ export default function CalculatePage() {
             level = level + 1;
             setCurrentLevel((prev) => prev + 1);
           }
-          const { arr, curOperation, arrCal } = resetArrNumber();
+          const { arr, final, curOperation } = resetArrNumber();
           const point = { ...prev, [strAnswer]: prev[strAnswer] + 1 };
-          setCurrentOperation(curOperation);
           localStorage.setItem(
-            "logic",
+            "calculate",
             JSON.stringify({
-              calculationNumber: arrCal,
               operation: operation,
               currentOperation: curOperation,
               point,
               arrNumber: arr,
+              finalResult: final,
               currentLevel: level,
             })
           );
@@ -207,16 +149,16 @@ export default function CalculatePage() {
   }, [selected]);
 
   useEffect(() => {
-    const calculateLocal = localStorage.getItem("logic");
+    const calculateLocal = localStorage.getItem("calculate");
     if (calculateLocal) {
       const data = JSON.parse(calculateLocal);
       setPoint((prev) => ({ ...prev, ...data.point }));
       setCurrentLevel(data.currentLevel);
       setCurrentOperation(data.currentOperation || currentOperation);
       setOperation(data.operation || operation);
-      setCalculationNumber((prev) => {
+      setFinalResult((prev) => {
         setArrNumber(data.arrNumber);
-        return data.calculationNumber;
+        return data.finalResult;
       });
     } else {
       resetArrNumber();
@@ -224,14 +166,93 @@ export default function CalculatePage() {
   }, []);
 
   useEffect(() => {
+    resetSelected();
+  }, [arrNumber]);
+
+  useEffect(() => {
     if (notify) setTimeout(() => setNotify(""), TIMEOUT * 2);
   }, [notify]);
 
+  const randomResult = (arrNumber) => {
+    const arrIsDisplay = arrNumber.filter((item) => item.isDisplay);
+    const arr = [];
+    for (let i = 0; i < NUMBER_CAL; i++) {
+      const random = Math.floor(Math.random() * arrIsDisplay.length);
+      arr.push(arrIsDisplay.splice(random, 1)[0].value);
+    }
+    const random = operation[Math.floor(Math.random() * operation.length)];
+    const finalResult = finalResultOperation(arr, random);
+
+    setCurrentOperation(random);
+    setFinalResult(finalResult);
+    return { final: finalResult, curOperation: random };
+  };
+
+  const finalResultOperation = (arr, operation) => {
+    let data = 0;
+    switch (operation) {
+      case "plus":
+        data = arr.reduce((prev, cur) => prev + cur);
+        break;
+      case "minus":
+        data = arr.sort((a, b) => b - a).reduce((prev, cur) => prev - cur);
+        break;
+      case "multiply":
+        data = arr.reduce((prev, cur) => prev * cur);
+        break;
+      case "divide":
+        data = arr.sort((a, b) => b - a).reduce((prev, cur) => prev / cur);
+        break;
+    }
+    return data;
+  };
+
+  const resetSelected = async () => {
+    setSelected([...new Array(2)].fill(null));
+  };
+
+  const resetArrNumber = () => {
+    const arr = [
+      ...Array.from({ length: ROWS * COLS }, () => {
+        return {
+          value: Math.floor(Math.random() * (currentLevel * SCOPE * 2)),
+          isDisplay: true,
+        };
+      }),
+    ];
+    setArrNumber(arr);
+    const { final, curOperation } = randomResult(arr);
+    return { arr, final, curOperation };
+  };
+
+  const enterNumber = (ev, { value, index }) => {
+    ev.preventDefault();
+    const foundEmpty = selected.findIndex((item) =>
+      [undefined, null, ""].includes(item)
+    );
+
+    if (selected.includes(index)) {
+      setSelected((prev) => {
+        const selected = [...prev];
+        const foundIndex = selected.findIndex((item) => item === index);
+
+        selected[foundIndex] = null;
+        return selected;
+      });
+    } else
+      setSelected((prev) => {
+        const selected = [...prev];
+        selected[foundEmpty > 0 ? foundEmpty : 0] = index;
+        return selected;
+      });
+  };
+
   const retryGame = () => {
+    resetSelected();
     resetArrNumber();
     setCurrentLevel(1);
     setPoint({ right: 0, wrong: 0 });
-    localStorage.removeItem("logic");
+    localStorage.removeItem("calculate");
     setOpenDialog(false);
   };
 
@@ -246,15 +267,16 @@ export default function CalculatePage() {
     setTempOperation((prev) => {
       if (prev.length) {
         setOperation(prev);
-        const calculateLocal = localStorage.getItem("logic");
+        const calculateLocal = localStorage.getItem("calculate");
         if (calculateLocal)
           localStorage.setItem(
-            "logic",
+            "calculate",
             JSON.stringify({
               ...JSON.parse(calculateLocal),
               operation: prev,
             })
           );
+        resetSelected();
       }
       // resetArrNumber();
       toggleOpenOperation();
@@ -353,11 +375,11 @@ export default function CalculatePage() {
         <div className="flex flex-1 gap-2 justify-center items-center text-center relative">
           <div className="flex gap-2 justify-center items-center rounded-lg">
             <p className="text-black bg-accent/10 rounded-lg h-16 w-16 p-3">
-              {calculationNumber[0] ?? ""}
+              {arrNumber[selected[0]]?.value ?? ""}
             </p>
             <p>{strOperation(currentOperation)}</p>
             <p className="text-black bg-accent/10 rounded-lg h-16 w-16 p-3">
-              {calculationNumber[1] ?? ""}
+              {arrNumber[selected[1]]?.value ?? ""}
             </p>
             <p>
               <svg
@@ -376,7 +398,7 @@ export default function CalculatePage() {
               </svg>
             </p>
             <p className="text-black bg-accent/10 rounded-lg h-16 min-w-[64px] p-3">
-              {arrNumber[selected]?.value?.toFixed(0) ?? ""}
+              {(finalResult && finalResult.toFixed(0)) || ""}
             </p>
           </div>
         </div>
@@ -389,7 +411,7 @@ export default function CalculatePage() {
               disabled={["", null, undefined].includes(item.value)}
               className={`p-2 w-full disabled:pointe-events-none h-[52px] text-2xl bg-accent/10 font-semibold rounded-lg ${
                 item.isDisplay
-                  ? selected === index
+                  ? selected.includes(index)
                     ? "bg-secondary/80 text-white"
                     : ""
                   : "invisible"

@@ -4,6 +4,7 @@ import MainPage from "./pages/MainPage";
 import Layout from "./pages/Layout";
 import { EffectContextProvider } from "./components/EffectContext";
 import CalculatePage from "./pages/CalculatePage";
+import LogicPage from "./pages/LogicPage";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route index element={<IndexPage />} />
           <Route path="/main" element={<MainPage />} />
           <Route path="/calculate" element={<CalculatePage />} />
+          <Route path="/logic" element={<LogicPage />} />
         </Route>
       </Routes>
     </EffectContextProvider>
