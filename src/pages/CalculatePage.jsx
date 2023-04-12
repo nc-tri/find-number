@@ -117,8 +117,12 @@ export default function CalculatePage() {
       const answer = finalResultOperation(arrSelected, currentOperation);
 
       setTimeout(() => {
-        const strAnswer = answer === finalResult ? "right" : "wrong";
-        const notify = answer === finalResult ? "Chính xác" : "Sai rồi";
+        const strAnswer =
+          answer.toFixed(0) === finalResult.toFixed(0) ? "right" : "wrong";
+        const notify =
+          answer.toFixed(0) === finalResult.toFixed(0)
+            ? "Chính xác"
+            : "Sai rồi";
         setNotify(notify);
         setPoint((prev) => {
           let level = currentLevel;
@@ -126,11 +130,13 @@ export default function CalculatePage() {
             level = level + 1;
             setCurrentLevel((prev) => prev + 1);
           }
-          const { arr, final } = resetArrNumber();
+          const { arr, final, curOperation } = resetArrNumber();
           const point = { ...prev, [strAnswer]: prev[strAnswer] + 1 };
           localStorage.setItem(
             "calculate",
             JSON.stringify({
+              operation: operation,
+              currentOperation: curOperation,
               point,
               arrNumber: arr,
               finalResult: final,
@@ -149,6 +155,8 @@ export default function CalculatePage() {
       const data = JSON.parse(calculateLocal);
       setPoint((prev) => ({ ...prev, ...data.point }));
       setCurrentLevel(data.currentLevel);
+      setCurrentOperation(data.currentOperation || currentOperation);
+      setOperation(data.operation || operation);
       setFinalResult((prev) => {
         setArrNumber(data.arrNumber);
         return data.finalResult;
@@ -178,7 +186,7 @@ export default function CalculatePage() {
 
     setCurrentOperation(random);
     setFinalResult(finalResult);
-    return finalResult;
+    return { final: finalResult, curOperation: random };
   };
 
   const finalResultOperation = (arr, operation) => {
@@ -194,7 +202,7 @@ export default function CalculatePage() {
         data = arr.reduce((prev, cur) => prev * cur);
         break;
       case "divide":
-        data = arr.reduce((prev, cur) => prev / cur);
+        data = arr.sort((a, b) => b - a).reduce((prev, cur) => prev / cur);
         break;
     }
     return data;
@@ -214,8 +222,8 @@ export default function CalculatePage() {
       }),
     ];
     setArrNumber(arr);
-    const final = randomResult(arr);
-    return { arr, final };
+    const { final, curOperation } = randomResult(arr);
+    return { arr, final, curOperation };
   };
 
   const enterNumber = (ev, { value, index }) => {
@@ -261,12 +269,21 @@ export default function CalculatePage() {
   };
 
   const changeOperation = () => {
-    // setTempOperation(operation);
-    setOperation((prev) => {
+    setTempOperation((prev) => {
+      setOperation(prev);
+      const calculateLocal = localStorage.getItem("calculate");
+      if (calculateLocal)
+        localStorage.setItem(
+          "calculate",
+          JSON.stringify({
+            ...JSON.parse(calculateLocal),
+            operation: prev,
+          })
+        );
       resetSelected();
-      resetArrNumber();
+      // resetArrNumber();
       toggleOpenOperation();
-      return tempOperation;
+      return [];
     });
   };
 
@@ -402,8 +419,8 @@ export default function CalculatePage() {
                 />
               </svg>
             </p>
-            <p className="text-black bg-accent/10 rounded-lg h-16 min-w-16 p-3">
-              {finalResult ?? ""}
+            <p className="text-black bg-accent/10 rounded-lg h-16 min-w-[64px] p-3">
+              {finalResult.toFixed(0) ?? ""}
             </p>
           </div>
         </div>
@@ -452,6 +469,7 @@ export default function CalculatePage() {
               <Checkbox
                 key={id}
                 id={id}
+                disabled={id === "divide"}
                 checked={tempOperation.includes(id)}
                 onChange={changeTempOperation}
               >

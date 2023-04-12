@@ -7,6 +7,7 @@ export default function Checkbox({
   children,
   id,
   checked,
+  disabled,
   values = [],
   ...props
 }) {
@@ -30,6 +31,7 @@ export default function Checkbox({
         id={id}
         name={id}
         checked={checked}
+        disabled={disabled}
         onClick={handleClick}
         onChange={handleChange}
         type="checkbox"
@@ -37,7 +39,9 @@ export default function Checkbox({
       <label
         htmlFor={id}
         {...props}
-        className="inline-flex items-center justify-between w-full px-4 py-2 border-2 border-gray-200 rounded-lg peer-checked:border-primary"
+        className={`${
+          disabled ? "opacity-30 bg-black/30" : ""
+        } inline-flex items-center justify-between w-full px-4 py-2 border-2 border-gray-200 rounded-lg peer-checked:border-primary`}
       >
         <span>{children}</span>
       </label>
