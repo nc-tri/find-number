@@ -420,7 +420,7 @@ export default function CalculatePage() {
               </svg>
             </p>
             <p className="text-black bg-accent/10 rounded-lg h-16 min-w-[64px] p-3">
-              {finalResult.toFixed(0) ?? ""}
+              {finalResult?.toFixed(0) ?? ""}
             </p>
           </div>
         </div>
