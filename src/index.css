@@ -38,6 +38,9 @@
   * {
     @apply select-none;
   }
+  /* input[type="checkbox"]:checked + label {
+    @apply bg-primary border-blue-500;
+  } */
 }
 
 @layer utilities {
