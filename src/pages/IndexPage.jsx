@@ -26,10 +26,15 @@ export default function IndexPage() {
           </Button>
           <Button
             onClick={toggleDialog}
-            // to="calculate"
             className="px-4 py-2 text-3xl font-semibold w-auto rounded-lg bg-tertiary/90 text-white"
           >
             Phép Tính
+          </Button>
+          <Button
+            to="sort"
+            className="px-4 py-2 text-3xl font-semibold w-auto rounded-lg bg-primary/90 text-white"
+          >
+            Tháp Hà Nội
           </Button>
         </div>
         <Dialog open={openDialog}>

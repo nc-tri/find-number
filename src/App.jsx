@@ -5,6 +5,7 @@ import Layout from "./pages/Layout";
 import { EffectContextProvider } from "./components/EffectContext";
 import CalculatePage from "./pages/CalculatePage";
 import LogicPage from "./pages/LogicPage";
+import SortPage from "./pages/SortPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/main" element={<MainPage />} />
           <Route path="/calculate" element={<CalculatePage />} />
           <Route path="/logic" element={<LogicPage />} />
+          <Route path="/sort" element={<SortPage />} />
         </Route>
       </Routes>
     </EffectContextProvider>
