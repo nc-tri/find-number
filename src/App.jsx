@@ -6,6 +6,7 @@ import { EffectContextProvider } from "./components/EffectContext";
 import CalculatePage from "./pages/CalculatePage";
 import LogicPage from "./pages/LogicPage";
 import SortPage from "./pages/SortPage";
+import PuzzlePage from "./pages/PuzzlePage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/calculate" element={<CalculatePage />} />
           <Route path="/logic" element={<LogicPage />} />
           <Route path="/sort" element={<SortPage />} />
+          <Route path="/puzzle" element={<PuzzlePage />} />
         </Route>
       </Routes>
     </EffectContextProvider>

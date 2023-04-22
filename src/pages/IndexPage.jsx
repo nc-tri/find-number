@@ -36,6 +36,12 @@ export default function IndexPage() {
           >
             Tháp Hà Nội
           </Button>
+          <Button
+            to="puzzle"
+            className="px-4 py-2 text-3xl font-semibold w-auto rounded-lg bg-quaternary/90 text-white"
+          >
+            Giải đố
+          </Button>
         </div>
         <Dialog open={openDialog}>
           <div className="flex gap-4">

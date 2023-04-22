@@ -18,3 +18,118 @@ export const CALCULATE = {
   SCOPE: 5,
   TIMEOUT: 500,
 };
+
+export const SIZE_COLOR = {
+  YELLOW: { width: 1, height: 1 },
+  BLUE_H: { width: 2, height: 1 },
+  BLUE_V: { width: 1, height: 2 },
+  RED: { width: 2, height: 2 },
+};
+
+const posCell = (pos, size) => {
+  return {
+    pos: { top: parseInt(pos / 4), left: parseInt(pos % 4) },
+    size: size,
+  };
+};
+
+export const LEVEL_PUZZLE = {
+  0: [
+    posCell(8, SIZE_COLOR.YELLOW),
+    posCell(9, SIZE_COLOR.BLUE_H),
+    posCell(0, SIZE_COLOR.RED),
+  ],
+  1: [
+    posCell(8, SIZE_COLOR.YELLOW),
+    posCell(2, SIZE_COLOR.YELLOW),
+    posCell(9, SIZE_COLOR.BLUE_H),
+    posCell(6, SIZE_COLOR.BLUE_H),
+    posCell(0, SIZE_COLOR.RED),
+  ],
+  2: [
+    posCell(5, SIZE_COLOR.BLUE_V),
+    posCell(2, SIZE_COLOR.YELLOW),
+    posCell(13, SIZE_COLOR.BLUE_H),
+    posCell(3, SIZE_COLOR.YELLOW),
+    posCell(1, SIZE_COLOR.YELLOW),
+    posCell(6, SIZE_COLOR.RED),
+  ],
+  3: [
+    posCell(4, SIZE_COLOR.BLUE_H),
+    posCell(2, SIZE_COLOR.YELLOW),
+    posCell(13, SIZE_COLOR.BLUE_H),
+    posCell(15, SIZE_COLOR.BLUE_V),
+    posCell(3, SIZE_COLOR.YELLOW),
+    posCell(1, SIZE_COLOR.YELLOW),
+    posCell(6, SIZE_COLOR.RED),
+  ],
+  4: [
+    posCell(8, SIZE_COLOR.BLUE_H),
+    posCell(4, SIZE_COLOR.YELLOW),
+    posCell(13, SIZE_COLOR.BLUE_H),
+    posCell(7, SIZE_COLOR.BLUE_V),
+    posCell(3, SIZE_COLOR.YELLOW),
+    posCell(0, SIZE_COLOR.YELLOW),
+    posCell(1, SIZE_COLOR.RED),
+  ],
+  5: [
+    posCell(8, SIZE_COLOR.BLUE_V),
+    posCell(2, SIZE_COLOR.YELLOW),
+    posCell(13, SIZE_COLOR.BLUE_H),
+    posCell(7, SIZE_COLOR.BLUE_V),
+    posCell(15, SIZE_COLOR.YELLOW),
+    posCell(0, SIZE_COLOR.YELLOW),
+    posCell(4, SIZE_COLOR.YELLOW),
+    posCell(1, SIZE_COLOR.YELLOW),
+    posCell(3, SIZE_COLOR.YELLOW),
+    posCell(5, SIZE_COLOR.RED),
+  ],
+  6: [
+    posCell(8, SIZE_COLOR.BLUE_V),
+    posCell(2, SIZE_COLOR.YELLOW),
+    posCell(9, SIZE_COLOR.BLUE_H),
+    posCell(7, SIZE_COLOR.BLUE_V),
+    posCell(15, SIZE_COLOR.YELLOW),
+    posCell(6, SIZE_COLOR.YELLOW),
+    posCell(13, SIZE_COLOR.YELLOW),
+    posCell(14, SIZE_COLOR.YELLOW),
+    posCell(3, SIZE_COLOR.YELLOW),
+    posCell(0, SIZE_COLOR.RED),
+  ],
+  7: [
+    posCell(2, SIZE_COLOR.RED),
+    posCell(5, SIZE_COLOR.YELLOW),
+    posCell(9, SIZE_COLOR.YELLOW),
+    posCell(0, SIZE_COLOR.BLUE_H),
+    posCell(10, SIZE_COLOR.BLUE_H),
+    posCell(13, SIZE_COLOR.BLUE_V),
+    posCell(14, SIZE_COLOR.YELLOW),
+    posCell(15, SIZE_COLOR.YELLOW),
+    posCell(4, SIZE_COLOR.BLUE_V),
+  ],
+  8: [
+    posCell(1, SIZE_COLOR.RED),
+    posCell(0, SIZE_COLOR.YELLOW),
+    posCell(4, SIZE_COLOR.YELLOW),
+    posCell(3, SIZE_COLOR.BLUE_V),
+    posCell(8, SIZE_COLOR.BLUE_H),
+    posCell(10, SIZE_COLOR.YELLOW),
+    posCell(11, SIZE_COLOR.YELLOW),
+    posCell(14, SIZE_COLOR.YELLOW),
+    posCell(12, SIZE_COLOR.BLUE_V),
+    posCell(15, SIZE_COLOR.BLUE_V),
+  ],
+  9: [
+    posCell(1, SIZE_COLOR.RED),
+    posCell(4, SIZE_COLOR.BLUE_V),
+    posCell(3, SIZE_COLOR.BLUE_V),
+    posCell(0, SIZE_COLOR.YELLOW),
+    posCell(9, SIZE_COLOR.YELLOW),
+    posCell(10, SIZE_COLOR.YELLOW),
+    posCell(11, SIZE_COLOR.YELLOW),
+    posCell(12, SIZE_COLOR.BLUE_V),
+    posCell(13, SIZE_COLOR.YELLOW),
+    posCell(14, SIZE_COLOR.YELLOW),
+    posCell(15, SIZE_COLOR.BLUE_V),
+  ],
+};
