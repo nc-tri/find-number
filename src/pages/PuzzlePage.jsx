@@ -162,6 +162,7 @@ export default function PuzzlePage() {
   };
 
   const nextLevel = () => {
+    setNotify(false);
     setLevel((prev) => prev + 1);
   };
 
@@ -242,7 +243,7 @@ export default function PuzzlePage() {
         <Button
           onClick={nextLevel}
           className={`px-4 py-2 text-2xl w-full font-semibold rounded-lg bg-tertiary/90 text-white ${
-            level < LEVEL_PUZZLE.length - 1 ? "" : "hidden"
+            level < Object.keys(LEVEL_PUZZLE).length - 1 ? "" : "hidden"
           }`}
         >
           Tiếp
