@@ -15,7 +15,7 @@ export default function PuzzlePage() {
   const [temp, setTemp] = useState({ x: 0, y: 0 });
   const [openDialog, setOpenDialog] = useState(false);
   const [notify, setNotify] = useState(false);
-  const [level, setLevel] = useState(9);
+  const [level, setLevel] = useState(0);
 
   const [elements, setElements] = useState([]);
 
