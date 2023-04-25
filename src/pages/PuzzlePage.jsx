@@ -12,7 +12,7 @@ const POS_RESULT = [13, 14, 17, 18];
 export default function PuzzlePage() {
   const [play] = useSound(tapSound);
   const [sizeCell, setSizeCell] = useState({ width: 0, height: 0, edge: 0 });
-  const [temp, setTemp] = useState({ x: 0, y: 0 });
+  const [temp, setTemp] = useState({ x: 0, y: 0, top: 0, left: 0 });
   const [openDialog, setOpenDialog] = useState(false);
   const [notify, setNotify] = useState(false);
   const [level, setLevel] = useState(0);
@@ -55,9 +55,9 @@ export default function PuzzlePage() {
     });
   }, [bodyRef?.current]);
 
-  const elementCell = (id) => {
-    if (!elements[id]) return [];
-    const { size, pos } = elements[id];
+  const elementCell = (id, arrEle = elements) => {
+    if (!arrEle[id]) return [];
+    const { size, pos } = arrEle[id];
     const arr = [];
     for (let i = 0; i < size.height; i++) {
       for (let j = 0; j < size.width; j++) {
@@ -68,6 +68,84 @@ export default function PuzzlePage() {
   };
 
   const onEnd = (ev) => {
+    ev.stopPropagation();
+    play();
+    setTimeout(() =>
+      setTemp((preTemp) => {
+        setElements((prev) => {
+          const { id } = ev.target;
+          const arrElement = [...prev];
+          arrElement[id].pos = {
+            top: Math.round(preTemp.top[id]),
+            left: Math.round(preTemp.left[id]),
+          };
+
+          return arrElement;
+        });
+        return null;
+      })
+    );
+
+    // ev.preventDefault();
+    // const { id } = ev.target;
+    // const { clientY, clientX } = ev.changedTouches[0];
+
+    // setTemp((prev) => {
+    //   if (prev === null) return null;
+    //   const valueY = clientY - prev.y;
+    //   const valueX = clientX - prev.x;
+    //   setElements((prev) => {
+    //     const prevElement = JSON.parse(JSON.stringify([...prev]));
+    //     const arrElement = [...prev];
+    //     const { top, left } = arrElement[id].pos;
+    //     const { width, height } = arrElement[id].size;
+    //     const maxTop = ROWS - 1 * height;
+    //     const maxLeft = COLS - 1 * width;
+
+    //     let posNew = { ...arrElement[id].pos };
+    //     if (Math.abs(valueY) > Math.abs(valueX)) {
+    //       let topNew =
+    //         valueY > sizeCell.edge / 3
+    //           ? top + 1
+    //           : valueY < -sizeCell.edge / 3
+    //           ? top - 1
+    //           : top;
+    //       posNew = {
+    //         ...posNew,
+    //         top: topNew < 0 ? 0 : topNew > maxTop ? maxTop : topNew,
+    //       };
+    //     } else {
+    //       const leftNew =
+    //         valueX > sizeCell.edge / 3
+    //           ? left + 1
+    //           : valueX < -sizeCell.edge / 3
+    //           ? left - 1
+    //           : left;
+
+    //       posNew = {
+    //         ...posNew,
+    //         left: leftNew < 0 ? 0 : leftNew > maxLeft ? maxLeft : leftNew,
+    //       };
+    //     }
+    //     arrElement[id].pos = posNew;
+
+    //     const arr = arrElement.reduce(
+    //       (prev, cur, index) => [...prev, ...(index ? elementCell(index) : [])],
+    //       elementCell(0)
+    //     );
+    //     const checkDuplicated = arr.some(
+    //       (item, index) => arr.indexOf(item) !== index
+    //     );
+    //     play();
+
+    //     return checkDuplicated ? prevElement : arrElement;
+    //   });
+    //   return null;
+    // });
+  };
+
+  const onMove = (ev) => {
+    ev.stopPropagation();
     const { id } = ev.target;
     const { clientY, clientX } = ev.changedTouches[0];
 
@@ -75,59 +153,172 @@ export default function PuzzlePage() {
       if (prev === null) return null;
       const valueY = clientY - prev.y;
       const valueX = clientX - prev.x;
-      setElements((prev) => {
-        const prevElement = JSON.parse(JSON.stringify([...prev]));
-        const arrElement = [...prev];
-        const { top, left } = arrElement[id].pos;
-        const { width, height } = arrElement[id].size;
-        const maxTop = ROWS - 1 * height;
-        const maxLeft = COLS - 1 * width;
+      let maxTop = ROWS - 1 * prev.height;
+      let minTop = 0;
+      let maxLeft = COLS - 1 * prev.width;
+      let minLeft = 0;
+      if (prev.isHor === undefined)
+        return { ...prev, isHor: !(Math.abs(valueY) > Math.abs(valueX)) };
+      let objTemp;
+      let topNew;
+      let leftNew;
+      const test = elements.filter((_, index) => +id !== index);
+      let arr = test.reduce(
+        (prev, cur, index) => [
+          ...prev,
+          ...(index ? elementCell(index, test) : []),
+        ],
+        elementCell(0, test)
+      );
+      if (!prev.isHor) {
+        topNew = elements[id].pos.top + valueY / sizeCell.edge;
 
-        let posNew = { ...arrElement[id].pos };
-        if (Math.abs(valueY) > Math.abs(valueX)) {
-          let topNew =
-            valueY > sizeCell.edge / 3
-              ? top + 1
-              : valueY < -sizeCell.edge / 3
-              ? top - 1
-              : top;
-          posNew = {
-            ...posNew,
-            top: topNew < 0 ? 0 : topNew > maxTop ? maxTop : topNew,
-          };
-        } else {
-          const leftNew =
-            valueX > sizeCell.edge / 3
-              ? left + 1
-              : valueX < -sizeCell.edge / 3
-              ? left - 1
-              : left;
+        for (let i = 0; i < prev.width; i++) {
+          const cell = elements[id].pos.top * COLS + elements[id].pos.left + i;
 
-          posNew = {
-            ...posNew,
-            left: leftNew < 0 ? 0 : leftNew > maxLeft ? maxLeft : leftNew,
-          };
+          arr.forEach((item) => {
+            const itemTop = Math.floor(item / COLS);
+            const cellTop = Math.floor(cell / COLS);
+            if (
+              item % COLS === cell % COLS &&
+              itemTop + 1 <= cellTop &&
+              minTop <= itemTop + 1 &&
+              elements[id].pos.top >= itemTop + 1
+            ) {
+              minTop = itemTop + 1;
+            }
+            if (
+              item % COLS === cell % COLS &&
+              itemTop - prev.height >= cellTop &&
+              maxTop >= itemTop - prev.height &&
+              elements[id].pos.top <= itemTop - prev.height
+            ) {
+              maxTop = itemTop - prev.height;
+            }
+          });
         }
-        arrElement[id].pos = posNew;
+        topNew = topNew < minTop ? minTop : topNew > maxTop ? maxTop : topNew;
+        objTemp = { ...prev, top: { [id]: topNew } };
+      } else {
+        leftNew = elements[id].pos.left + valueX / sizeCell.edge;
+        for (let i = 0; i < prev.height; i++) {
+          const cell =
+            (elements[id].pos.top + i) * COLS + elements[id].pos.left;
+          arr.forEach((item) => {
+            const itemLeft = item % COLS;
+            const cellLeft = cell % COLS;
+            if (
+              Math.floor(item / COLS) === Math.floor(cell / COLS) &&
+              itemLeft + 1 <= cellLeft &&
+              minLeft <= itemLeft + 1 &&
+              elements[id].pos.left >= itemLeft + 1
+            ) {
+              minLeft = itemLeft + 1;
+            }
+            if (
+              Math.floor(item / COLS) === Math.floor(cell / COLS) &&
+              itemLeft - prev.width >= cellLeft &&
+              maxLeft >= itemLeft - prev.width &&
+              elements[id].pos.left <= itemLeft - prev.width
+            ) {
+              maxLeft = itemLeft - prev.width;
+            }
+          });
+        }
+        leftNew =
+          leftNew < minLeft ? minLeft : leftNew > maxLeft ? maxLeft : leftNew;
+        objTemp = { ...prev, left: { [id]: leftNew } };
+      }
+      // const test = elements.filter((item, index) => {
+      //   console.log(id, index);
+      //   return +id !== index;
+      // });
+      // console.log(test);
+      // const { pos, size } = elements[id];
+      // if (pos.left > leftNew) {
+      //   const arrTest = test.reduce(
+      //     (prev, cur, index) => [
+      //       ...prev,
+      //       ...(index ? elementCell(index, test) : []),
+      //     ],
+      //     elementCell(0)
+      //   );
+      //   const cellTemp = [];
+      //   for (let i = 0; i < prev.height; i++) {
+      //     for (let j = 0; j < prev.width; j++) {
+      //       cellTemp.push((prev.top[id] + i) * COLS + prev.left[id] + j);
+      //     }
+      //   }
+      //   console.log(arrTest, cellTemp, Math.floor(leftNew));
 
-        const arr = arrElement.reduce(
-          (prev, cur, index) => [...prev, ...(index ? elementCell(index) : [])],
-          elementCell(0)
-        );
-        const checkDuplicated = arr.some(
-          (item, index) => arr.indexOf(item) !== index
-        );
-        play();
+      // const arrSort = [
+      //   ...arrTest,
+      //   ...cellTemp.map((item) => Math.floor(item)),
+      // ];
 
-        return checkDuplicated ? prevElement : arrElement;
-      });
-      return null;
+      // console.log(arrSort);
+
+      //   const check = arrTest;
+      //   return objTemp;
+      // }
+      return objTemp;
+      // setElements((prevEle) => {
+      //   const prevElement = JSON.parse(JSON.stringify([...prevEle]));
+      //   const arrElement = [...prevEle];
+      //   const { top, left } = arrElement[id].pos;
+      //   const { width, height } = arrElement[id].size;
+      //   const maxTop = ROWS - 1 * height;
+      //   const maxLeft = COLS - 1 * width;
+
+      //   let posNew = { ...arrElement[id].pos };
+      //   if (!prev.isHor) {
+      //     let topNew = prev.top[id] + valueY / sizeCell.edge;
+      //     posNew = {
+      //       ...posNew,
+      //       top: topNew < 0 ? 0 : topNew > maxTop ? maxTop : topNew,
+      //     };
+      //   } else {
+      //     let leftNew = prev.left[id] + valueX / sizeCell.edge;
+      //     posNew = {
+      //       ...posNew,
+      //       left: leftNew < 0 ? 0 : leftNew > maxLeft ? maxLeft : leftNew,
+      //     };
+      //   }
+      //   arrElement[id].pos = posNew;
+
+      //   const arr = arrElement.reduce(
+      //     (prev, cur, index) => [...prev, ...(index ? elementCell(index) : [])],
+      //     elementCell(0)
+      //   );
+
+      //   const test = arr.map((item) =>
+      //     item < Math.round(item) ? Math.trunc(item) : Math.ceil(item)
+      //   );
+      //   console.log(test);
+      //   const checkDuplicated = test.some(
+      //     (item, index) => test.indexOf(item) !== index
+      //   );
+
+      //   // console.log(checkDuplicated);
+
+      //   return checkDuplicated ? prevElement : arrElement;
+      // });
+      return prev;
     });
   };
 
-  const onStart = (ev) => {
+  const onStart = (ev, { top, left }, { width, height }) => {
+    ev.stopPropagation();
     const { clientY, clientX } = ev.touches[0];
-    setTemp({ x: clientX, y: clientY });
+    const { id } = ev.target;
+    setTemp({
+      x: clientX,
+      y: clientY,
+      top: { [id]: top },
+      left: { [id]: left },
+      width,
+      height,
+    });
   };
 
   const colorCell = ({ width, height }) => {
@@ -218,12 +409,13 @@ export default function PuzzlePage() {
                 id={index}
                 key={index}
                 style={{
-                  top: pos?.top * sizeCell.edge,
-                  left: pos?.left * sizeCell.edge,
+                  top: (temp?.top[index] ?? pos?.top) * sizeCell.edge,
+                  left: (temp?.left[index] ?? pos?.left) * sizeCell.edge,
                   width: `${widthCell(width)}px`,
                   height: `${heightCell(height)}px`,
                 }}
-                onTouchStart={onStart}
+                onTouchStart={(ev) => onStart(ev, pos, { width, height })}
+                onTouchMove={onMove}
                 onTouchEnd={onEnd}
                 className={`absolute rounded-lg border ${colorCell({
                   width,
