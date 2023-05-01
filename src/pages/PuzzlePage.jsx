@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSound from "use-sound";
 import Button from "../components/Button";
 import Dialog from "../components/Dialog";
 import { LEVEL_PUZZLE } from "../helper/constants";
+import Radio from "../components/Radio";
 const tapSound = new URL("../assets/tap-sound.wav", import.meta.url).href;
 
 const ROWS = 5;
@@ -14,19 +15,34 @@ export default function PuzzlePage() {
   const [sizeCell, setSizeCell] = useState({ width: 0, height: 0, edge: 0 });
   const [temp, setTemp] = useState({ x: 0, y: 0, top: 0, left: 0 });
   const [openDialog, setOpenDialog] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
   const [notify, setNotify] = useState(false);
   const [level, setLevel] = useState(0);
+  const [levelTemp, setLevelTemp] = useState(0);
 
   const [elements, setElements] = useState([]);
 
   useEffect(() => {
-    resetElements();
+    const puzzleLocal = localStorage.getItem("puzzle");
+    if (puzzleLocal)
+      setElements((prev) => {
+        const { level: levelLocal, elements: elementsLocal } =
+          JSON.parse(puzzleLocal);
+        setLevel(levelLocal);
+        return (
+          elementsLocal || JSON.parse(JSON.stringify(LEVEL_PUZZLE[levelLocal]))
+        );
+      });
+    else resetElements();
   }, []);
 
-  useEffect(() => {
-    const levelPuzzle = JSON.parse(JSON.stringify(LEVEL_PUZZLE[level]));
-    setElements(levelPuzzle);
-  }, [level]);
+  // useEffect(() => {
+  //   const levelPuzzle = JSON.parse(JSON.stringify(LEVEL_PUZZLE[level]));
+  //   const puzzleLocal = localStorage.getItem("puzzle");
+  //   // setElements(levelPuzzle);
+  //   console.log();
+  //   // localStorage.setItem("puzzle", JSON.stringify({ level: level }));
+  // }, [level]);
 
   const resetElements = () => {
     const levelPuzzle = JSON.parse(JSON.stringify(LEVEL_PUZZLE[level]));
@@ -80,6 +96,13 @@ export default function PuzzlePage() {
             left: Math.round(preTemp.left[id]),
           };
 
+          localStorage.setItem(
+            "puzzle",
+            JSON.stringify({
+              elements: arrElement,
+              level: level,
+            })
+          );
           return arrElement;
         });
         return null;
@@ -348,13 +371,50 @@ export default function PuzzlePage() {
 
   const retryGame = () => {
     resetElements();
-    toggleDialog();
-    setNotify(false);
+    setNotify((prev) => {
+      if (!prev) toggleDialog();
+      localStorage.setItem(
+        "puzzle",
+        JSON.stringify({
+          level: level,
+        })
+      );
+      return false;
+    });
   };
 
-  const nextLevel = () => {
+  const nextLevel = (_, value) => {
+    if (value === level) return;
     setNotify(false);
-    setLevel((prev) => prev + 1);
+    setLevel((prev) => {
+      const newLevel = value ?? prev + 1;
+      const levelPuzzle = JSON.parse(JSON.stringify(LEVEL_PUZZLE[newLevel]));
+      setElements(levelPuzzle);
+      localStorage.setItem(
+        "puzzle",
+        JSON.stringify({
+          level: newLevel,
+        })
+      );
+      return newLevel;
+    });
+  };
+
+  const selectLevel = (ev) => {
+    const value = +ev.target.value;
+    setLevelTemp(value);
+  };
+
+  const toggleOpenMenu = () => {
+    setOpenMenu((prev) => {
+      if (!prev) setLevelTemp(level);
+      return !prev;
+    });
+  };
+
+  const changeLevel = () => {
+    nextLevel(null, levelTemp);
+    toggleOpenMenu();
   };
 
   return (
@@ -362,24 +422,45 @@ export default function PuzzlePage() {
       <div className="absolute w-full top-0 -mt-[52px] right-0">
         <div className="flex items-center justify-between">
           <p></p>
-          <h3 className="pl-10 text-phudu font-bold">Giải đố</h3>
-          <Button
-            onClick={toggleDialog}
-            className="bg-primary text-white p-1 rounded-full"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-7 h-7"
+          <h3 className="pl-20 text-phudu font-bold">Giải đố</h3>
+          <div className="flex gap-2">
+            <Button
+              onClick={toggleOpenMenu}
+              className="bg-tertiary text-white p-1 rounded-full"
             >
-              <path
-                fillRule="evenodd"
-                d="M12 5.25c1.213 0 2.415.046 3.605.135a3.256 3.256 0 013.01 3.01c.044.583.077 1.17.1 1.759L17.03 8.47a.75.75 0 10-1.06 1.06l3 3a.75.75 0 001.06 0l3-3a.75.75 0 00-1.06-1.06l-1.752 1.751c-.023-.65-.06-1.296-.108-1.939a4.756 4.756 0 00-4.392-4.392 49.422 49.422 0 00-7.436 0A4.756 4.756 0 003.89 8.282c-.017.224-.033.447-.046.672a.75.75 0 101.497.092c.013-.217.028-.434.044-.651a3.256 3.256 0 013.01-3.01c1.19-.09 2.392-.135 3.605-.135zm-6.97 6.22a.75.75 0 00-1.06 0l-3 3a.75.75 0 101.06 1.06l1.752-1.751c.023.65.06 1.296.108 1.939a4.756 4.756 0 004.392 4.392 49.413 49.413 0 007.436 0 4.756 4.756 0 004.392-4.392c.017-.223.032-.447.046-.672a.75.75 0 00-1.497-.092c-.013.217-.028.434-.044.651a3.256 3.256 0 01-3.01 3.01 47.953 47.953 0 01-7.21 0 3.256 3.256 0 01-3.01-3.01 47.759 47.759 0 01-.1-1.759L6.97 15.53a.75.75 0 001.06-1.06l-3-3z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </Button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-7 h-7"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+                />
+              </svg>
+            </Button>
+            <Button
+              onClick={toggleDialog}
+              className="bg-primary text-white p-1 rounded-full"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-7 h-7"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M12 5.25c1.213 0 2.415.046 3.605.135a3.256 3.256 0 013.01 3.01c.044.583.077 1.17.1 1.759L17.03 8.47a.75.75 0 10-1.06 1.06l3 3a.75.75 0 001.06 0l3-3a.75.75 0 00-1.06-1.06l-1.752 1.751c-.023-.65-.06-1.296-.108-1.939a4.756 4.756 0 00-4.392-4.392 49.422 49.422 0 00-7.436 0A4.756 4.756 0 003.89 8.282c-.017.224-.033.447-.046.672a.75.75 0 101.497.092c.013-.217.028-.434.044-.651a3.256 3.256 0 013.01-3.01c1.19-.09 2.392-.135 3.605-.135zm-6.97 6.22a.75.75 0 00-1.06 0l-3 3a.75.75 0 101.06 1.06l1.752-1.751c.023.65.06 1.296.108 1.939a4.756 4.756 0 004.392 4.392 49.413 49.413 0 007.436 0 4.756 4.756 0 004.392-4.392c.017-.223.032-.447.046-.672a.75.75 0 00-1.497-.092c-.013.217-.028.434-.044.651a3.256 3.256 0 01-3.01 3.01 47.953 47.953 0 01-7.21 0 3.256 3.256 0 01-3.01-3.01 47.759 47.759 0 01-.1-1.759L6.97 15.53a.75.75 0 001.06-1.06l-3-3z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </Button>
+          </div>
         </div>
       </div>
       <h3 className="text-4xl text-black/90 font-bold text-center">
@@ -427,10 +508,15 @@ export default function PuzzlePage() {
         </div>
       </div>
       <div
-        className={`flex justify-between gap-4 ${!notify ? "opacity-0" : ""}`}
+        className={`flex justify-between gap-4 ${
+          !notify ? "opacity-0 pointer-events-none" : ""
+        }`}
       >
-        <Button className="px-4 py-2 text-2xl w-full font-semibold rounded-lg bg-accent/90 text-white">
-          Menu
+        <Button
+          onClick={retryGame}
+          className="px-4 py-2 text-2xl w-full font-semibold rounded-lg bg-accent/90 text-white"
+        >
+          Chơi lại
         </Button>
         <Button
           onClick={nextLevel}
@@ -457,6 +543,46 @@ export default function PuzzlePage() {
           >
             Đóng
           </Button>
+        </div>
+      </Dialog>
+      <Dialog
+        open={openMenu}
+        classDialog={"h-screen max-w-[100vw] m-0 rounded-none"}
+      >
+        <div className="flex flex-col h-full w-[380px] px-4 mx-auto text-center justify-between text-phudu">
+          <h3>Menu</h3>
+          <div className="h-full w-full my-4 px-2 overflow-auto">
+            <div className="grid grid-cols-4 w-full gap-4 items-center mx-auto">
+              {Object.keys(LEVEL_PUZZLE).map((item) => (
+                <Radio
+                  key={item}
+                  id={"level_" + item}
+                  checked={levelTemp === +item}
+                  value={item}
+                  onChange={selectLevel}
+                  className="!w-full"
+                  classLabel="!justify-center py-[30%]"
+                  name="level"
+                >
+                  <p className="text-3xl">{+item + 1}</p>
+                </Radio>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <Button
+              onClick={changeLevel}
+              className="px-4 py-2 text-lg font-semibold w-full mx-auto rounded-lg bg-tertiary/80 text-white"
+            >
+              Đồng ý
+            </Button>
+            <Button
+              onClick={toggleOpenMenu}
+              className="px-4 py-2 text-lg font-semibold w-full mx-auto rounded-lg bg-quaternary/80 text-white"
+            >
+              Hủy
+            </Button>
+          </div>
         </div>
       </Dialog>
     </div>

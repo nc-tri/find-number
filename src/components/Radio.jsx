@@ -10,6 +10,7 @@ export default function Radio({
   disabled,
   name,
   value,
+  classLabel,
   ...props
 }) {
   const [play] = useSound(tapSound);
@@ -26,7 +27,7 @@ export default function Radio({
   return !children ? (
     <input type="radio" {...props} onClick={handleClick} />
   ) : (
-    <div className="relative w-max">
+    <div className={`relative w-max ${props.className}`}>
       <input
         className="peer hidden"
         id={id}
@@ -43,7 +44,7 @@ export default function Radio({
         {...props}
         className={`${
           disabled ? "opacity-30 bg-black/30" : ""
-        } inline-flex items-center justify-between w-full px-4 py-2 border-2 border-gray-200 rounded-lg peer-checked:border-primary`}
+        } inline-flex items-center justify-between w-full px-4 py-2 border-2 border-gray-200 rounded-lg peer-checked:border-primary ${classLabel}`}
       >
         <span>{children}</span>
       </label>
