@@ -547,7 +547,7 @@ export default function PuzzlePage() {
       </Dialog>
       <Dialog
         open={openMenu}
-        classDialog={"h-screen max-w-[100vw] m-0 rounded-none"}
+        classDialog={"h-screen !max-w-[100vw] m-0 rounded-none"}
       >
         <div className="flex flex-col h-full w-[380px] px-4 mx-auto text-center justify-between text-phudu">
           <h3>Menu</h3>
