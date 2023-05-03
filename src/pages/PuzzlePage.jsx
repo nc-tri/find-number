@@ -480,7 +480,9 @@ export default function PuzzlePage() {
                       className={`border-collapse border border-white rounded-lg ${colorCellResult(
                         { row, col }
                       )}`}
-                    ></td>
+                    >
+                      {row * COLS + col}
+                    </td>
                   ))}
                 </tr>
               ))}
