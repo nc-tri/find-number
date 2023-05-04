@@ -481,7 +481,7 @@ export default function PuzzlePage() {
                         { row, col }
                       )}`}
                     >
-                      {row * COLS + col}
+                      {/* {row * COLS + col} */}
                     </td>
                   ))}
                 </tr>
